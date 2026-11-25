@@ -34,8 +34,13 @@ export default function App() {
   const [totalItens, setTotalItens] = useState(0);
 
   const carregarLista = useCallback(async (database, pagina = 1) => {
+    // Verifica se a instância do banco de dados está disponível
     if (!database) return;
+
+    // Pede ao Config.tsx apenas os registros da página solicitada
     const dados = await selectProdutosPaginados(database, pagina, ITENS_POR_PAGINA);
+    
+    // Atualiza o estado com os dados recebidos
     setProdutos(dados.itens);
     setPaginaAtual(dados.paginaAtual);
     setTotalPaginas(dados.totalPaginas);
@@ -44,11 +49,11 @@ export default function App() {
 
   useEffect(() => {
     async function Main() {
-      const instanciaDb = await Banco();
+      const instanciaDb = await Banco(); // Abre ou cria o arquivo SQLite e retorna a conexão (instanciaDb)
       if (instanciaDb) {
         setDb(instanciaDb);
-        await createTable(instanciaDb);
-        await carregarLista(instanciaDb, 1);
+        await createTable(instanciaDb); // Garante que a tabela de produtos exista e, se estiver vazia, insere os produtos iniciais
+        await carregarLista(instanciaDb, 1); // Carrega a primeira página de produtos do banco de dados
       }
     }
     Main();
